@@ -7,8 +7,8 @@
     {
       "path": "pages/reserve/index",
       "style": {
-        "navigationBarTitleText": "预约"
-        // "navigationStyle": "custom"
+        "navigationBarTitleText": "预约",
+        "navigationStyle": "custom"
       }
     },
     {

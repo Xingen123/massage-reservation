@@ -14,7 +14,11 @@
       :duration="500"
     >
       <swiper-item v-for="(item, index) in state.bannerList" :key="index">
-        <image :src="item.image" mode="aspectFill" class="banner-image" />
+        <image
+          :src="`${CDN_BASE_URL}${item.imgHref}`"
+          mode="aspectFill"
+          class="banner-image"
+        />
       </swiper-item>
     </swiper>
 
@@ -26,7 +30,11 @@
         :key="index"
         @click="navigateToService(item.id)"
       >
-        <image :src="item.icon" mode="aspectFit" class="service-icon" />
+        <image
+          :src="`${CDN_BASE_URL}${item.icon}`"
+          mode="aspectFit"
+          class="service-icon"
+        />
         <text class="service-name">{{ item.name }}</text>
       </view>
     </view>
@@ -34,11 +42,14 @@
     <!-- 关于我们 -->
     <view class="about-section">
       <view class="section-title">关于我们</view>
-      <image
-        src="/static/images/about.jpg"
-        mode="widthFix"
-        class="about-image"
-      />
+      <view v-for="(item, i) in state.storeList" :key="item.id">
+        <image
+          @click="gotoPage(item, i)"
+          :src="`${CDN_BASE_URL}${item.storeImg}`"
+          mode="widthFix"
+          class="about-image"
+        />
+      </view>
     </view>
 
     <!-- 底部导航 -->
@@ -50,28 +61,22 @@
 import { onLoad } from "@dcloudio/uni-app";
 import { ref } from "vue";
 import request from "@/api";
+import { CDN_BASE_URL } from "@/api/config/BASE_URL";
 const state = reactive({
   bannerList: [],
   kingList: [],
+  storeList: [],
+  locationMap: {
+    0: {
+      latitude: 31.005669,
+      longitude: 112.2014,
+    },
+    1: {
+      latitude: 31.04958,
+      longitude: 112.214595,
+    },
+  },
 });
-// Banner 轮播数据
-const bannerList = ref([
-  {
-    id: 1,
-    image: "/static/images/banner.png",
-    title: "康特推拿",
-  },
-  {
-    id: 2,
-    image: "/static/images/banner.png",
-    title: "线上预约 正式上线",
-  },
-  {
-    id: 3,
-    image: "/static/images/banner.png",
-    title: "专业推拿服务",
-  },
-]);
 
 // 服务功能数据
 const kingList = ref([
@@ -137,9 +142,9 @@ const navigateToService = (id) => {
 };
 const getBannerData = async () => {
   try {
-    //const res = await request.sendRequestByKey("GET_BANNER_LIST");
-    //console.log("请求成功：", res);
-    state.bannerList = bannerList;
+    const { data = [] } = await request.sendRequestByKey("GET_BANNER_LIST");
+    console.log("请求成功：", data);
+    state.bannerList = data;
   } catch (err) {
     console.error("请求失败：", err);
   }
@@ -153,6 +158,23 @@ const getKingData = async () => {
     console.error("请求失败：", err);
   }
 };
+const getStoreData = async () => {
+  try {
+    const { data = [] } = await request.sendRequestByKey("GET_STORE_LIST");
+    console.log("请求成功：", data);
+    state.storeList = data;
+  } catch (err) {
+    console.error("请求失败：", err);
+  }
+};
+const gotoPage = (item, i) => {
+  Map.openMap(
+    state.locationMap[i].latitude,
+    state.locationMap[i].longitude,
+    item.storeName,
+    "GCJ-02"
+  );
+};
 // 导航到分店页面
 const navigateToBranch = (id) => {
   uni.navigateTo({
@@ -162,6 +184,7 @@ const navigateToBranch = (id) => {
 onLoad(() => {
   getBannerData();
   getKingData();
+  getStoreData();
 });
 </script>
 
@@ -290,6 +313,7 @@ onLoad(() => {
 
 .about-image {
   width: 100%;
-  border-radius: 8rpx;
+
+  border-radius: 20rpx;
 }
 </style>

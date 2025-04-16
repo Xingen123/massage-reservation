@@ -4,52 +4,118 @@
     <view class="header">
       <text class="title">全部服务</text>
     </view>
-
     <view class="content-wrapper">
       <!-- 左侧菜单栏 -->
       <view class="sidebar">
         <view
-          v-for="(item, index) in menuItems"
+          v-for="(item, index) in state.menuItems"
           :key="index"
           class="menu-item"
-          :class="{ active: currentService === item.id }"
-          @click="selectService(item.id)"
+          :class="{ active: state.currentServiceId === item.projectId }"
+          @click="selectService(item.projectId)"
         >
-          <text>{{ item.name }}</text>
+          <text>{{ item.projectName }}</text>
         </view>
       </view>
-
       <!-- 右侧内容区 -->
-      <view class="content-area" :style="gradientStyle">
-        <OnlineServices v-if="currentService === 'appointment'" />
+      <view
+        class="content-area h-full overflow-y-scroll"
+        :style="gradientStyle"
+      >
+        <view>
+          <OnlineServices
+            v-if="state.currentServiceId === 'appointment'"
+            :projectList="state.projectList"
+          />
+          <PediatricConditioning
+            v-if="state.currentServiceId === 1"
+            :info="state.menuItemsMap[state.currentServiceId]"
+          />
+          <LocationStoreList
+            v-if="['location', 'consultation'].includes(state.currentServiceId)"
+          />
+        </view>
       </view>
     </view>
-
     <!-- 底部导航 -->
     <TabBar />
   </view>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { onLoad } from "@dcloudio/uni-app";
 import OnlineServices from "./components/OnlineServices/index.vue";
+import PediatricConditioning from "./components/PediatricConditioning/index.vue";
+import LocationStoreList from "./components/LocationStoreList/index.vue";
+import request from "@/api";
+const defaultMtniu = [
+  { projectId: "appointment", projectName: "在线预约" },
+  { projectId: "location", projectName: "定位导航" },
+  { projectId: "consultation", projectName: "问诊咨询" },
+];
 // 菜单项数据
-const menuItems = ref([
-  { id: "appointment", name: "在线预约" },
-  { id: "location", name: "定位导航" },
-  { id: "consultation", name: "问诊咨询" },
-  { id: "children", name: "小儿调理" },
-  { id: "eastSquare", name: "东方广场总店" },
-  { id: "xiangshan", name: "象山二路旗舰店" },
-]);
+
+const state = reactive({
+  menuItems: [],
+  currentServiceId: "appointment",
+  menuItemsMap: {},
+  userInfo: {},
+  projectList: [],
+});
 
 // 当前选中的服务
-const currentService = ref("appointment");
+const currentService = ref(1);
 
 // 选择服务
 const selectService = (serviceId) => {
-  currentService.value = serviceId;
+  state.currentServiceId = serviceId;
 };
+// const getData = async () => {
+//   try {
+//     const { data = [] } = await request.sendRequestByKey("GET_PROJECT_LIST");
+//     console.log("请求成功：", data);
+
+//   } catch (err) {
+//     console.error("请求失败：", err);
+//   }
+// };
+const getProjectData = async () => {
+  try {
+    const [projectRes, storeRes] = await Promise.all([
+      request.sendRequestByKey("GET_PROJECT_LIST"),
+      request.sendRequestByKey("GET_STORE_LIST"),
+    ]);
+    const projectList = projectRes.data || [];
+    state.projectList = projectList;
+    const storeList = storeRes.data || [];
+    const newStoreList = storeList.map((item) => {
+      return {
+        projectName: item.storeName,
+        projectId: item.storeName,
+        ...item,
+      };
+    });
+    console.log("请求成功：projectResprojectRes", projectRes, projectRes);
+    state.menuItems = [...defaultMtniu, ...projectList, ...newStoreList];
+    state.menuItemsMap = [...newStoreList].reduce((map, item) => {
+      map[item.projectId] = item;
+      return map;
+    }, {});
+  } catch (err) {
+    console.error("请求失败：", err);
+  }
+};
+
+// const getStoreData = async () => {
+//   try {
+//     const { data = [] } = await ;
+//     console.log("请求成功：", data);
+//     state.menuItems = [...defaultMtniu, ...data];
+//     state.storeList = data;
+//   } catch (err) {
+//     console.error("请求失败：", err);
+//   }
+// };
 
 // 背景渐变样式
 const gradientStyle = computed(() => {
@@ -58,6 +124,13 @@ const gradientStyle = computed(() => {
       "linear-gradient(to bottom, #a88bdb, #8ba5db, #b8d1e8, #f5d6e0)",
   };
 });
+
+onLoad(() => {
+  // 获取数据
+  // getData();
+  // getStoreData();
+  getProjectData();
+});
 </script>
 
 <style>
@@ -65,7 +138,7 @@ const gradientStyle = computed(() => {
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #fff;
 }
 
@@ -107,6 +180,7 @@ const gradientStyle = computed(() => {
   display: flex;
   flex: 1;
   width: 100%;
+  height: calc(100vh - 100rpx);
 }
 
 /* 左侧菜单栏样式 */
@@ -121,22 +195,21 @@ const gradientStyle = computed(() => {
   align-items: center;
   justify-content: center;
   border-bottom: 1rpx solid #e0e0e0;
-  font-size: 28rpx;
+  font-size: 30rpx;
   color: #a88bdb;
   text-align: center;
   padding: 0 10rpx;
 }
 
 .menu-item.active {
-  background-color: #a88bdb;
-  color: #fff;
+  background-image: linear-gradient(rgb(168, 139, 219), rgb(184, 209, 232));
+  color: #812895;
 }
 
 /* 右侧内容区样式 */
 .content-area {
   flex: 1;
-  padding: 30rpx;
-  min-height: 1000rpx; /* 确保内容区足够高 */
+  padding: 30rpx 30rpx 150rpx 30rpx;
 }
 
 .service-description {

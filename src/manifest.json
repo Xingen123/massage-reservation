@@ -90,6 +90,27 @@
   "mp-toutiao": {
     "usingComponents": true
   },
+  "h5": {
+    "sdkConfigs": {
+      "maps": {
+        "qqmap": {
+          "key": "ZBWBZ-X3MWZ-ADGX7-TT6ZG-HSLN5-HLBFS"
+        }
+      }
+    },
+    "optimization": {
+      "prefetch": true,
+      "preload": true
+    },
+    "router": {
+      "mode": "history",
+      "base": ""
+    },
+    "condition": {
+      "canUseCustomComponents": true
+    },
+    "devServer": {}
+  },
   "uniStatistics": {
     "enable": false
   },

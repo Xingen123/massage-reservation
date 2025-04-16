@@ -38,10 +38,10 @@ request.setResponseInterceptor((res) => {
     return Promise.reject(`HTTP:${res.statusCode}:网络错误稍后再试`);
   }
 
-  if (res.data.code === 200 || businessCodes.includes(res.data.code)) {
+  if (res.data.state === 200 || businessCodes.includes(res.data.state)) {
     return res.data;
   }
-  if (res.data.code === 401) {
+  if (res.data.state === 401) {
     uni.showToast({
       title: `登录已过期，请重新登录`,
       icon: "none",
@@ -51,10 +51,10 @@ request.setResponseInterceptor((res) => {
     });
   } else {
     uni.showToast({
-      title: `${res.data.code}: ${res.data.msg}`,
+      title: `${res.data.state}: ${res.data.msg}`,
       icon: "none",
     });
-    return Promise.reject(`${res.data.code}: ${res.data.msg}`);
+    return Promise.reject(`${res.data.state}: ${res.data.msg}`);
   }
 });
 

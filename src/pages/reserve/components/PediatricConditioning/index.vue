@@ -1,26 +1,11 @@
 <template>
   <view class="service-description">
     <text class="service-desc">
-      {{ state.desc }}
+      {{ info.projectDesc }}
     </text>
   </view>
 
-  <view v-if="!state.pagetype && projectList && projectList.length">
-    <view
-      class="service-card"
-      v-for="(item, i) in projectList"
-      :key="i"
-      @click="getData(item)"
-    >
-      <image
-        src="/static/images/user-avatar-default.webp"
-        mode="aspectFit"
-        class="service-image"
-      />
-      <text class="service-title">{{ item.projectName }}</text>
-    </view>
-  </view>
-  <view v-else>
+  <view>
     <view class="flex flex-col gap-20" v-if="state.techList">
       <view
         class="p-30 bg-white rounded-20 flex"
@@ -51,32 +36,25 @@
 </template>
 
 <script setup>
-import { useLoadMore, usePopupShow, usePagination } from "@/hooks";
 import request from "@/api";
 import { CDN_BASE_URL } from "@/api/config/BASE_URL";
-const { status, setLoadMoreStatus } = useLoadMore();
-const pagination = usePagination();
-
 defineProps({
-  projectList: {
-    type: Array,
-    default: () => [],
+  info: {
+    type: Object,
+    default: () => ({
+      projectName: "",
+      projectDesc: "",
+    }),
   },
 });
 const state = reactive({
-  desc: "康特推拿是任田院长于2004年创办的一家专门做中医推拿的推拿馆。我们的服务项目包括伤科推拿、内科推拿、小儿推拿等。我们的宗旨是解除您疼痛，还您一个健康生活。",
   pagetype: 0,
-  projectName: "小儿调理",
   techList: [],
 });
 
-const getData = async (item) => {
-  state.pagetype = 1;
+const getData = async () => {
   try {
-    const params = {
-      projectId: item.projectId,
-    };
-    const { data } = await request.sendRequestByKey("GET_TECH_LIST", params);
+    const { data } = await request.sendRequestByKey("GET_TECH_LIST");
     state.techList = data;
   } catch (err) {
     console.error("请求失败：", err);
@@ -88,9 +66,10 @@ const gotoPage = (item) => {
     url: `/pages/reserve/reserve?userInfo=${userInfo}`,
   });
 };
+
 onMounted(() => {
   // 获取数据
-  //getData();
+  getData();
 });
 </script>
 

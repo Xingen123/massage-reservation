@@ -62,4 +62,15 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    proxy: {
+      // 配置代理规则
+      "/api/": {
+        // 目标服务器地址，需替换为实际的后端接口地址
+        target: "https://ktapp.kangtetuina.com/",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
 });

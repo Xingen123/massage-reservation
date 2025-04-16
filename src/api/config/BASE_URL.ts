@@ -13,7 +13,7 @@ type BaseUrlMap = {
 
 // 定义基础 URL 映射对象
 const BASE_URL_MAP: BaseUrlMap = {
-  [Env.DEV]: "http://192.168.3.8:8080",
+  [Env.DEV]: "/api",
   //[Env.DEV]: "http://192.168.3.94:4000",
   //[Env.DEV]: "http://192.168.3.171:8080",
   [Env.UAT]: "https://uat-service-api.yyzhst.cn",
@@ -41,6 +41,6 @@ console.log(
   `%c 当前BASE_URL: ${BASE_URL}`,
   "background: rgba(0,0,0,0.6);color: red;font-weight:700;padding:4px"
 );
-const CDN_BASE_URL = "https://47.104.228.224";
+const CDN_BASE_URL = "https://ktapp.kangtetuina.com/";
 // 导出基础 URL 和环境枚举
 export { BASE_URL, BASE_URL_MAP, CDN_BASE_URL, Env };
