@@ -2,9 +2,13 @@
   <view v-if="state.visible" class="dialog-mask" @click="handleMaskClick">
     <view class="dialog-container">
       <view class="dialog-title" v-if="state.title">{{ state.title }}</view>
-      <view class="dialog-message" v-if="state.message">{{
-        state.message
-      }}</view>
+      <view
+        class="dialog-message"
+        v-if="state.message"
+        v-html="state.message"
+      ></view>
+
+      <slot class="dialog-message"></slot>
       <view class="dialog-buttons">
         <view
           size="mini"
@@ -36,7 +40,7 @@ const state = reactive({
   cancelButtonText: "取消",
   confirmButtonText: "确定",
   cancelButtonColor: "#cccccc",
-  confirmButtonColor: "#36b569",
+  confirmButtonColor: "#1296db",
   showCancelButton: true,
   onConfirm: () => {},
   onCancel: () => {},

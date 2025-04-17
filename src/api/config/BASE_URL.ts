@@ -16,10 +16,10 @@ const BASE_URL_MAP: BaseUrlMap = {
   [Env.DEV]: "/api",
   //[Env.DEV]: "http://192.168.3.94:4000",
   //[Env.DEV]: "http://192.168.3.171:8080",
-  [Env.UAT]: "https://uat-service-api.yyzhst.cn",
+  [Env.UAT]: "https://ktapp.kangtetuina.com",
   //[Env.UAT]: "http://47.104.228.224",
-  [Env.PRE]: "http://192.168.3.94:8080",
-  [Env.PRO]: "http://192.168.3.94:8080",
+  [Env.PRE]: "https://ktapp.kangtetuina.com",
+  [Env.PRO]: "https://ktapp.kangtetuina.com",
 };
 
 // 定义获取基础 URL 的函数，并指定参数和返回值的类型

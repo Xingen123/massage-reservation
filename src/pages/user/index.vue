@@ -7,27 +7,25 @@
     />
 
     <view class="user-info_wrap flex flex-col gap-20 p-20">
-      <view class="flex justify-between items-center" @click="goLogin">
+      <view class="flex justify-between items-center" @click="avatarClick">
         <view class="flex items-center gap-20">
           <image
             class="user-info__avatar"
-            :src="
-              userInfo.user.avatar || '/static/images/user-avatar-default.webp'
-            "
+            :src="'/static/images/user-avatar-default.webp'"
             mode="scaleToFill"
           />
 
           <view class="gap-10 text-info"
             ><view class="text-42 mb-8">{{
-              userInfo.user.name || "未登陆"
+              userInfo.nickName || "未登陆"
             }}</view>
             <view>
-              <text class="iconfont icon-phone">{{
+              <!-- <text class="iconfont icon-phone">{{
                 userInfo.user.mobile?.replace(
                   /^(\d{3})\d{4}(\d{4})$/,
                   "$1****$2"
                 ) || "未绑定手机号"
-              }}</text>
+              }}</text> -->
             </view>
           </view>
         </view>
@@ -39,21 +37,28 @@
         <view class="user-meniu-content p-30 bg-white rounded-10 mt-30">
           <view
             class="flex justify-between items-center border-b-grey-light-4 py-14"
+            @click="goPage('reserveList')"
           >
             <text class="iconfont icon-fankuijianyi text-34 text-primary">
-              <text class="text-black-little ml-20" @click="goLogin"
-                >切换帐号
-              </text>
+              <text class="text-black-little ml-20"> 预约列表 </text>
             </text>
             <text class="iconfont icon-xiangqing text-38 text-info"></text>
           </view>
           <view
             class="flex justify-between items-center border-b-grey-light-4 py-14"
+            @click="goPage('login')"
           >
             <text class="iconfont icon-fankuijianyi text-34 text-primary">
-              <text class="text-black-little ml-20" @click="systemStore.logOut"
-                >退出登录
-              </text>
+              <text class="text-black-little ml-20"> 切换帐号 </text>
+            </text>
+            <text class="iconfont icon-xiangqing text-38 text-info"></text>
+          </view>
+          <view
+            class="flex justify-between items-center border-b-grey-light-4 py-14"
+            @click="systemStore.logOut(false)"
+          >
+            <text class="iconfont icon-fankuijianyi text-34 text-primary">
+              <text class="text-black-little ml-20"> 退出登录 </text>
             </text>
             <text class="iconfont icon-xiangqing text-38 text-info"></text>
           </view>
@@ -74,28 +79,18 @@ const systemStore = useSystemStore();
 //getUserInfo
 const { userInfo } = storeToRefs(userStore);
 const state = reactive({ menuName: "", placeholder: "" });
-const formData = reactive({
-  orderId: "",
-  menuId: "",
-  canteenId: "",
-  starrating: 0,
-  remark: "",
-});
 
+const avatarClick = () => {
+  if (userInfo.value.token) return;
+  goPage("login");
+};
 const goPage = (key: string) => {
+  const pageMap = {
+    reserveList: "/pages/user/reserveList",
+    login: "/pages/login/index",
+  };
   Native.push(JUMP_TYPE.SELF, { url: pageMap[key as keyof typeof pageMap] });
 };
-const init = () => {
-  userStore.getUserInfo();
-};
-const goLogin = () => {
-  uni.navigateTo({
-    url: "/pages/login/index",
-  });
-};
-onLoad(() => {
-  init();
-});
 </script>
 <style lang="scss" scoped>
 .user {

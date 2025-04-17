@@ -4,6 +4,7 @@
       {{ state.desc }}
     </text>
   </view>
+
   <view>
     <view class="flex flex-col gap-20" v-if="state.storeList">
       <view
@@ -39,13 +40,10 @@
 import request from "@/api";
 import { CDN_BASE_URL } from "@/api/config/BASE_URL";
 import { Map } from "@/utils";
-defineProps({
-  info: {
-    type: Object,
-    default: () => ({
-      projectName: "",
-      projectDesc: "",
-    }),
+const props = defineProps({
+  type: {
+    type: String,
+    default: () => "",
   },
 });
 
@@ -67,15 +65,24 @@ const state = reactive({
 
 const getData = async () => {
   try {
+    uni.showLoading();
     const { data = [] } = await request.sendRequestByKey("GET_STORE_LIST");
     console.log("请求成功：", data);
     state.storeList = data;
+    uni.hideLoading();
   } catch (err) {
+    uni.hideLoading();
     console.error("请求失败：", err);
   }
 };
 
 const gotoPage = (item, i) => {
+  if (props.type === "consultation") {
+    uni.makePhoneCall({
+      phoneNumber: item.storeMobile, //仅为示例
+    });
+    return;
+  }
   Map.openMap(
     state.locationMap[i].latitude,
     state.locationMap[i].longitude,

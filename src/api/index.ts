@@ -14,7 +14,7 @@ request.setRequestInterceptor((config) => {
   );
   const token = Storage.get("USER_TOKEN");
   if (token) {
-    config.header.Authorization = `Bearer ${token}`;
+    config.header.auth = `${token}`;
   }
   return config;
 });
@@ -41,7 +41,7 @@ request.setResponseInterceptor((res) => {
   if (res.data.state === 200 || businessCodes.includes(res.data.state)) {
     return res.data;
   }
-  if (res.data.state === 401) {
+  if (res.data.state === 202) {
     uni.showToast({
       title: `登录已过期，请重新登录`,
       icon: "none",
@@ -51,10 +51,10 @@ request.setResponseInterceptor((res) => {
     });
   } else {
     uni.showToast({
-      title: `${res.data.state}: ${res.data.msg}`,
+      title: `${res.data.message}`,
       icon: "none",
     });
-    return Promise.reject(`${res.data.state}: ${res.data.msg}`);
+    return Promise.reject(`${res.data.state}: ${res.data.message}`);
   }
 });
 

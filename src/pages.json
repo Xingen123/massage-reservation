@@ -17,7 +17,12 @@
         "navigationBarTitleText": "预约"
       }
     },
-
+    {
+      "path": "pages/user/reserveList",
+      "style": {
+        "navigationBarTitleText": "我的预约列表"
+      }
+    },
     {
       "path": "pages/login/index",
       "style": {

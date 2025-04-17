@@ -1,108 +1,26 @@
 import { defineStore } from "pinia";
 import request from "@/api";
 
-// 定义 User 类型
-type User = {
-  avatar: string | null;
-  cardno: string | null;
-  centeenIds: string | null;
-  code: string | null;
-  createBy: string | null;
-  createTime: string | null;
-  id: string | null;
-  mobile: string | null;
-  name: string | null;
-  nickname: string | null;
-  oldtype: string | null;
-  openid: string | null;
-  remark: string | null;
-  roleId: string | null;
-  sex: string | null;
-  supplierIds: string | null;
-  type: string | null;
-  updateBy: string | null;
-  updateTime: string | null;
-};
-
 // 定义 UserInfo 类型
 type UserInfo = {
-  canteens: any[]; // 这里可以根据实际情况修改 any 为具体类型
-  suppliers: any[];
-  userStatus: string | null;
-  roles: {};
-  rolesGroup: string[]; // 这里可以根据实际情况修改 any 为具体类型
-  user: User;
+  isTech: "";
+  nickName: "";
+  token: "";
 };
 
 const useUserStore = defineStore(
   "userStore",
   () => {
-    // 初始化用户基础信息
-    const userBaseInfo = reactive<User>({
-      avatar: null,
-      cardno: null,
-      centeenIds: null,
-      code: null,
-      createBy: null,
-      createTime: null,
-      id: null,
-      mobile: null,
-      name: null,
-      nickname: null,
-      oldtype: null,
-      openid: null,
-      remark: null,
-      roleId: null,
-      sex: null,
-      supplierIds: null,
-      type: null,
-      updateBy: null,
-      updateTime: null,
-    });
-
     // 初始化用户信息，使用 ref 创建响应式对象
     const userInfo = reactive<UserInfo>({
-      canteens: [],
-      suppliers: [],
-      rolesGroup: [],
-      roles: {},
-      userStatus: "",
-      user: {
-        avatar: null,
-        cardno: null,
-        centeenIds: null,
-        code: null,
-        createBy: null,
-        createTime: null,
-        id: null,
-        mobile: null,
-        name: null,
-        nickname: null,
-        oldtype: null,
-        openid: null,
-        remark: null,
-        roleId: null,
-        sex: null,
-        supplierIds: null,
-        type: null,
-        updateBy: null,
-        updateTime: null,
-      },
+      isTech: "",
+      nickName: "",
+      token: "",
     });
 
     // 更新用户基础信息的方法
-    const updateUserBaseInfo = (user: User) => {
-      Object.assign(userBaseInfo, user);
-    };
-
-    // 清空用户基础信息的方法
-    const clearUserBaseInfo = () => {
-      return new Promise((resolve, reject) => {
-        Object.keys(userBaseInfo).forEach((key) => {
-          (userBaseInfo as any)[key] = null;
-        });
-        resolve(true);
-      });
+    const updateUserBaseInfo = (user: UserInfo) => {
+      Object.assign(userInfo, user);
     };
 
     // 更新用户信息的方法
@@ -112,30 +30,22 @@ const useUserStore = defineStore(
 
     // 清空用户信息的方法
     const clearUserInfo = () => {
-      return new Promise((resolve, reject) => {
-        Object.assign(userInfo, {
-          canteens: [],
-          suppliers: [],
-          rolesGroup: [],
-          roles: {},
-          user: {
-            ...userBaseInfo,
-          },
+      return new Promise((resolve) => {
+        Object.keys(userInfo).forEach((key) => {
+          (userInfo as any)[key] = null;
         });
         resolve(true);
       });
     };
     const clear = async () => {
-      await clearUserBaseInfo();
       await clearUserInfo();
       return Promise.resolve(true);
     };
     // 获取用户信息的异步方法
     const getUserInfo = async () => {
       try {
-        console.log("userBaseInfo", userBaseInfo);
         const { data } = await request.sendRequestByKey("GET_USER_INFO", {
-          openid: userBaseInfo.openid,
+          // openid: userBaseInfo.openid,
         });
         const rolesGroup = ["base"];
         if (data.canteens.length) {
@@ -258,10 +168,8 @@ const useUserStore = defineStore(
     };
 
     return {
-      userBaseInfo,
       userInfo,
       updateUserBaseInfo,
-      clearUserBaseInfo,
       updateUserInfo,
       clearUserInfo,
       getUserInfo,

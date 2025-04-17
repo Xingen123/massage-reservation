@@ -31,10 +31,10 @@ const useSystemStore = defineStore(
         const { data } = await request.sendRequestByKey("LOGIN", params);
         console.log("登录成功：", data);
         Storage.set("USER_TOKEN", data.token);
-        if (data?.user) {
-          userStore.updateUserBaseInfo(data.user); // 更新用户信息
-          return data.user;
-        }
+        userStore.updateUserBaseInfo(data); // 更新用户信息
+        uni.reLaunch({
+          url: "/pages/index/index",
+        });
         return Promise.resolve(data);
       } catch (err) {
         console.error("请求失败：", err);
@@ -43,8 +43,9 @@ const useSystemStore = defineStore(
     };
 
     const logOut = async (isLoginPage = false) => {
+      console.log("ppppp");
       await useUserStore().clear();
-      await useTabBarStore().clear();
+
       await clear();
       uni.clearStorageSync();
       // 可以在这里添加登出的逻辑，例如清除用户信息等

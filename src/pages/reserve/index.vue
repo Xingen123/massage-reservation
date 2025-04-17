@@ -11,8 +11,8 @@
           v-for="(item, index) in state.menuItems"
           :key="index"
           class="menu-item"
-          :class="{ active: state.currentServiceId === item.projectId }"
-          @click="selectService(item.projectId)"
+          :class="{ active: state.currentIndex === index }"
+          @click="selectService(item, index)"
         >
           <text>{{ item.projectName }}</text>
         </view>
@@ -24,15 +24,18 @@
       >
         <view>
           <OnlineServices
-            v-if="state.currentServiceId === 'appointment'"
+            v-if="state.currentType === 'appointment'"
             :projectList="state.projectList"
           />
           <PediatricConditioning
-            v-if="state.currentServiceId === 1"
-            :info="state.menuItemsMap[state.currentServiceId]"
+            v-if="['pediatricConditioning'].includes(state.currentType)"
+            :projectId="pediatricConditioningConfig.projectId"
+            :storeId="pediatricConditioningConfig.storeId"
+            :techId="pediatricConditioningConfig.techId"
           />
           <LocationStoreList
-            v-if="['location', 'consultation'].includes(state.currentServiceId)"
+            v-if="['location', 'consultation'].includes(state.currentType)"
+            :type="state.currentType"
           />
         </view>
       </view>
@@ -49,26 +52,46 @@ import PediatricConditioning from "./components/PediatricConditioning/index.vue"
 import LocationStoreList from "./components/LocationStoreList/index.vue";
 import request from "@/api";
 const defaultMtniu = [
-  { projectId: "appointment", projectName: "在线预约" },
-  { projectId: "location", projectName: "定位导航" },
-  { projectId: "consultation", projectName: "问诊咨询" },
+  { type: "appointment", projectName: "在线预约" },
+  { type: "location", projectName: "定位导航" },
+  { type: "consultation", projectName: "问诊咨询" },
+  { type: "pediatricConditioning", projectName: "小儿理疗" },
 ];
 // 菜单项数据
 
 const state = reactive({
   menuItems: [],
-  currentServiceId: "appointment",
+  currentIndex: 0,
+  currentType: "appointment",
   menuItemsMap: {},
   userInfo: {},
   projectList: [],
 });
-
+const pediatricConditioningConfig = reactive({
+  projectId: "",
+  storeId: "",
+  techId: "",
+});
 // 当前选中的服务
 const currentService = ref(1);
 
 // 选择服务
-const selectService = (serviceId) => {
-  state.currentServiceId = serviceId;
+const selectService = (item, i) => {
+  state.currentIndex = i;
+  console.log("itemitemitemitem", item, i);
+  if (item?.type?.includes("store")) {
+    state.currentType = "pediatricConditioning";
+    pediatricConditioningConfig.projectId = "";
+    pediatricConditioningConfig.storeId = item.storeId;
+    pediatricConditioningConfig.techId = item.techId;
+    return;
+  }
+  if (item.type === "pediatricConditioning") {
+    pediatricConditioningConfig.projectId = 1;
+    pediatricConditioningConfig.storeId = "";
+    pediatricConditioningConfig.techId = "";
+  }
+  state.currentType = item.type;
 };
 // const getData = async () => {
 //   try {
@@ -90,19 +113,22 @@ const getProjectData = async () => {
     const storeList = storeRes.data || [];
     const newStoreList = storeList.map((item) => {
       return {
-        projectName: item.storeName,
-        projectId: item.storeName,
         ...item,
+        projectName: item.storeName,
+        projectId: item.storeId,
+        type: "store",
       };
     });
     console.log("请求成功：projectResprojectRes", projectRes, projectRes);
-    state.menuItems = [...defaultMtniu, ...projectList, ...newStoreList];
+    state.menuItems = [...defaultMtniu, ...newStoreList];
     state.menuItemsMap = [...newStoreList].reduce((map, item) => {
       map[item.projectId] = item;
       return map;
     }, {});
+    return Promise.resolve();
   } catch (err) {
     console.error("请求失败：", err);
+    return Promise.reject();
   }
 };
 
@@ -125,11 +151,15 @@ const gradientStyle = computed(() => {
   };
 });
 
-onLoad(() => {
+onLoad(async (options) => {
   // 获取数据
   // getData();
   // getStoreData();
-  getProjectData();
+  await getProjectData();
+  const activeIndex = options?.activeIndex;
+  console.log(activeIndex, "activeIndex");
+  activeIndex &&
+    selectService(state.menuItems[activeIndex], Number(activeIndex));
 });
 </script>
 
@@ -195,7 +225,7 @@ onLoad(() => {
   align-items: center;
   justify-content: center;
   border-bottom: 1rpx solid #e0e0e0;
-  font-size: 30rpx;
+  font-size: 24rpx;
   color: #a88bdb;
   text-align: center;
   padding: 0 10rpx;

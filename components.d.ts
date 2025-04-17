@@ -7,9 +7,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    DatePicker: typeof import('./src/components/DatePicker/index.vue')['default']
-    DateRangePicker: typeof import('./src/components/DateRangePicker/index.vue')['default']
-    DateTimePicker: typeof import('./src/components/DateTimePicker/index.vue')['default']
     Dialog: typeof import('./src/components/Dialog/index.vue')['default']
     Layout: typeof import('./src/components/Layout/index.vue')['default']
     LoadMore: typeof import('./src/components/LoadMore/index.vue')['default']

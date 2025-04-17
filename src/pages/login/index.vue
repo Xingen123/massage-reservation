@@ -10,12 +10,12 @@
             @click="switchTab('login')"
             >用户登录</view
           >
-          <view
+          <!-- <view
             class="tab-item"
             :class="{ active: activeTab === 'register' }"
             @click="switchTab('register')"
             >用户注册</view
-          >
+          > -->
         </view>
 
         <view class="group_4">
@@ -70,9 +70,11 @@
   </view>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, onUnmounted } from "vue";
-
+import request from "@/api";
+import { useSystemStore } from "@/store";
+const systemStore = useSystemStore();
 // 定义响应式数据
 const activeTab = ref("login");
 const phone = ref("");
@@ -95,9 +97,8 @@ const switchTab = (tab) => {
 };
 
 // 获取验证码
-const getVerifyCode = () => {
+const getVerifyCode = async () => {
   if (counting.value) return;
-
   // 验证手机号
   if (!/^1[3-9]\d{9}$/.test(phone.value)) {
     uni.showToast({
@@ -107,21 +108,28 @@ const getVerifyCode = () => {
     return;
   }
 
-  // 开始倒计时
-  counting.value = true;
-  countdown.value = 60;
-  codeText.value = `${countdown.value}s`;
-
-  timer.value = setInterval(() => {
-    if (countdown.value > 0) {
-      countdown.value--;
-      codeText.value = `${countdown.value}s`;
-    } else {
-      counting.value = false;
-      codeText.value = "获取验证码";
-      clearInterval(timer.value);
-    }
-  }, 1000);
+  try {
+    const params = {
+      mobile: phone.value,
+    };
+    await request.sendRequestByKey("SEND_SMS", params);
+    // 开始倒计时
+    counting.value = true;
+    countdown.value = 60;
+    codeText.value = `${countdown.value}s`;
+    timer.value = setInterval(() => {
+      if (countdown.value > 0) {
+        countdown.value--;
+        codeText.value = `${countdown.value}s`;
+      } else {
+        counting.value = false;
+        codeText.value = "获取验证码";
+        clearInterval(timer.value);
+      }
+    }, 1000);
+  } catch (error) {
+    console.log(error);
+  }
 
   // TODO: 调用验证码接口
 };
@@ -136,7 +144,8 @@ const handleSubmit = () => {
 };
 
 // 登录处理
-const handleLogin = () => {
+const handleLogin = async () => {
+  // TODO: 调用登录接口
   if (!phone.value || !verifyCode.value) {
     uni.showToast({
       title: "请填写完整信息",
@@ -144,8 +153,7 @@ const handleLogin = () => {
     });
     return;
   }
-
-  // TODO: 调用登录接口
+  await systemStore.logIn({ mobile: phone.value, code: verifyCode.value });
 };
 
 // 注册处理
@@ -194,11 +202,18 @@ onUnmounted(() => {
 }
 .page {
   padding-top: 24rpx;
-  border-radius: 48rpx;
+
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
+  background-image: linear-gradient(
+    to bottom,
+    #a88bdb,
+    #8ba5db,
+    #b8d1e8,
+    #f5d6e0
+  );
 }
 .group_2 {
   overflow-x: hidden;
@@ -232,7 +247,7 @@ onUnmounted(() => {
 }
 .section {
   padding: 142rpx 60rpx 92rpx;
-  background-color: #ffffff;
+
   border-radius: 48rpx;
 }
 .section_2 {
@@ -318,7 +333,7 @@ onUnmounted(() => {
 
 .tab-item {
   font-size: 32rpx;
-  color: #999;
+  color: #666;
   padding: 0 30rpx;
   position: relative;
 }

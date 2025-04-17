@@ -13,7 +13,7 @@
       @click="getData(item)"
     >
       <image
-        src="/static/images/user-avatar-default.webp"
+        src="/static/images/icon-children-tuina.png"
         mode="aspectFit"
         class="service-image"
       />
@@ -72,13 +72,19 @@ const state = reactive({
 
 const getData = async (item) => {
   state.pagetype = 1;
+  uni.showLoading();
   try {
     const params = {
       projectId: item.projectId,
     };
-    const { data } = await request.sendRequestByKey("GET_TECH_LIST", params);
+    const { data } = await request.sendRequestByKey(
+      "GET_TECH_LIST_PROJECT",
+      params
+    );
     state.techList = data;
+    uni.hideLoading();
   } catch (err) {
+    uni.hideLoading();
     console.error("请求失败：", err);
   }
 };

@@ -30,11 +30,7 @@
         :key="index"
         @click="navigateToService(item.id)"
       >
-        <image
-          :src="`${CDN_BASE_URL}${item.icon}`"
-          mode="aspectFit"
-          class="service-icon"
-        />
+        <image :src="item.icon" mode="aspectFit" class="service-icon" />
         <text class="service-name">{{ item.name }}</text>
       </view>
     </view>
@@ -83,51 +79,50 @@ const kingList = ref([
   {
     id: 1,
     name: "在线预约",
-    icon: "/static/images/user-avatar-default.webp",
-    url: "/pages/appointment/index",
+    icon: "/static/images/icon-reservation-online.png",
+    url: "/pages/reserve/index",
   },
   {
     id: 2,
     name: "问诊咨询",
-    icon: "/static/images/user-avatar-default.webp",
-    url: "/pages/consultation/index",
+    icon: "/static/images/icon-counselling.png",
+    url: "/pages/reserve/index?activeIndex=2",
   },
   {
     id: 3,
     name: "定位导航",
-    icon: "/static/images/user-avatar-default.webp",
-    url: "/pages/location/index",
+    icon: "/static/images/icon-location.png",
+    url: "/pages/reserve/index?activeIndex=1",
   },
   {
     id: 4,
     name: "儿推报号",
-    icon: "/static/images/user-avatar-default.webp",
-    url: "/pages/children/index",
+    icon: "/static/images/icon-calling-number.png",
+    url: "/pages/reserve/index",
   },
 
   {
     id: 5,
     name: "东方广场总店",
-    icon: "/static/images/user-avatar-default.webp",
-    address: "东方广场A座1层",
+    icon: "/static/images/icon-duodao-store.png",
+    url: "/pages/reserve/index?activeIndex=4",
   },
   {
     id: 6,
     name: "象山二路旗舰店",
-    icon: "/static/images/user-avatar-default.webp",
-    address: "象山二路商业街12号",
+    icon: "/static/images/icon-dongbao-store.png",
+    url: "/pages/reserve/index?activeIndex=5",
   },
   {
     id: 7,
     name: "小儿调理",
-    icon: "/static/images/user-avatar-default.webp",
-    address: "专业小儿推拿",
+    icon: "/static/images/icon-children-tuina.png",
+    url: "/pages/reserve/index?activeIndex=3",
   },
   {
     id: 8,
     name: "敬请期待",
-    icon: "/static/images/user-avatar-default.webp",
-    address: "更多门店敬请期待",
+    icon: "/static/images/icon-adult-tuina.png",
   },
 ]);
 
@@ -151,8 +146,6 @@ const getBannerData = async () => {
 };
 const getKingData = async () => {
   try {
-    //const res = await request.sendRequestByKey("GET_BANNER_LIST");
-    //console.log("请求成功：", res);
     state.kingList = kingList;
   } catch (err) {
     console.error("请求失败：", err);
@@ -168,12 +161,9 @@ const getStoreData = async () => {
   }
 };
 const gotoPage = (item, i) => {
-  Map.openMap(
-    state.locationMap[i].latitude,
-    state.locationMap[i].longitude,
-    item.storeName,
-    "GCJ-02"
-  );
+  uni.navigateTo({
+    url: `/pages/reserve/index?activeIndex=${i + 4}`,
+  });
 };
 // 导航到分店页面
 const navigateToBranch = (id) => {

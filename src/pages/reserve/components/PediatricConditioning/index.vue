@@ -1,12 +1,15 @@
 <template>
   <view class="service-description">
     <text class="service-desc">
-      {{ info.projectDesc }}
+      {{ state.desc }}
     </text>
   </view>
 
-  <view>
-    <view class="flex flex-col gap-20" v-if="state.techList">
+  <view v-if="(state.pagetype = 1)">
+    <view
+      class="flex flex-col gap-20"
+      v-if="state.techList && state.techList.length"
+    >
       <view
         class="p-30 bg-white rounded-20 flex"
         @click="gotoPage(item)"
@@ -36,40 +39,76 @@
 </template>
 
 <script setup>
+import { useLoadMore, usePopupShow, usePagination } from "@/hooks";
 import request from "@/api";
 import { CDN_BASE_URL } from "@/api/config/BASE_URL";
-defineProps({
-  info: {
-    type: Object,
-    default: () => ({
-      projectName: "",
-      projectDesc: "",
-    }),
+const { status, setLoadMoreStatus } = useLoadMore();
+const pagination = usePagination();
+
+const props = defineProps({
+  projectId: {
+    type: String,
+    default: "",
+  },
+  storeId: {
+    type: String,
+    default: "",
+  },
+  techId: {
+    type: String,
+    default: "",
   },
 });
 const state = reactive({
+  desc: "康特推拿是任田院长于2004年创办的一家专门做中医推拿的推拿馆。我们的服务项目包括伤科推拿、内科推拿、小儿推拿等。我们的宗旨是解除您疼痛，还您一个健康生活。",
   pagetype: 0,
+  projectName: "小儿调理",
   techList: [],
 });
 
-const getData = async () => {
+const getData = async (type = 0) => {
+  uni.showLoading();
+  state.techList = [];
   try {
-    const { data } = await request.sendRequestByKey("GET_TECH_LIST");
+    const params = {
+      projectId: props.projectId,
+      storeId: props.storeId,
+      techId: props.techId,
+    };
+    const { data } = await request.sendRequestByKey(
+      type ? "GET_TECH_LIST_STORE" : "GET_TECH_LIST_PROJECT",
+      params
+    );
     state.techList = data;
+    state.pagetype = 1;
+    uni.hideLoading();
   } catch (err) {
+    uni.hideLoading();
     console.error("请求失败：", err);
   }
 };
+
 const gotoPage = (item) => {
   const userInfo = JSON.stringify(item);
   uni.navigateTo({
     url: `/pages/reserve/reserve?userInfo=${userInfo}`,
   });
 };
+// watch(
+//   [props.projectId, props.storeId, props.techId],
+//   () => {
 
+//   },
+//   {
+//     immediate: true,
+//   }
+// );
+
+watchEffect(() => {
+  getData(props.storeId);
+});
 onMounted(() => {
   // 获取数据
-  getData();
 });
 </script>
 
