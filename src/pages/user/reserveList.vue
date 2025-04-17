@@ -57,15 +57,20 @@
           class="flex justify-between items-center text-black text-24 py-10"
         >
           <view class="flex-col-w-1 text-left">预约状态：</view>
-          <view class="flex-col-w-3 text-right">{{
-            item.reservationStatus ? "已取消" : "已预约"
-          }}</view>
+          <view
+            :class="[
+              'flex-col-w-3 text-right',
+              state.statusColorMap[item.reservationStatus].class,
+            ]"
+            >{{ state.statusColorMap[item.reservationStatus].text }}</view
+          >
         </view>
 
         <view
           class="flex-th-td-item flex justify-end items-center text-info text-24 border-t-info my-14 pt-14"
         >
           <view
+            v-if="!item.reservationStatus"
             class="px-16 py-6 rounded-10 bg-danger text-left text-28 text-white"
             @click="cancel(item)"
           >
@@ -110,13 +115,19 @@ const state = reactive({
   tabData: [],
   headerHieght: 120,
   statusColorMap: {
-    0: "#999999",
-    1: "#333333",
-    2: "#43CF7C",
-    3: "#FF5733",
-    4: "#FF5733",
-    5: "#169C4B",
-    6: "#D43030",
+    //1预约中,0已预约，1已取消，2已结束
+    0: {
+      text: "已预约",
+      class: "text-success",
+    },
+    1: {
+      text: "已取消",
+      class: "text-info",
+    },
+    2: {
+      text: "已结束",
+      class: "text-info",
+    },
   },
 });
 
