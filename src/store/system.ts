@@ -33,7 +33,7 @@ const useSystemStore = defineStore(
         Storage.set("USER_TOKEN", data.token);
         userStore.updateUserBaseInfo(data); // 更新用户信息
         uni.reLaunch({
-          url: "/pages/index/index",
+          url: data.isTech ? "/pages/teacher/index" : "/pages/index/index",
         });
         return Promise.resolve(data);
       } catch (err) {

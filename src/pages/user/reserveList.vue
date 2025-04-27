@@ -1,6 +1,6 @@
 <template>
   <view class="quotation-component bg-green-light px-24">
-    <view class="flex flex-col gap-20 mt-20">
+    <view class="flex flex-col gap-20 pt-50">
       <view
         class="bg-white py-24 px-30 rounded-20 text-24 box-border mt-50"
         v-for="(item, i) in state.tabData"
@@ -156,8 +156,8 @@ const getData = async () => {
   const { pageNum, pageSize } = pagination.state;
   const params = {
     ...formData,
-    pageNum: 100000000,
-    pageSize,
+    pageNum: 1,
+    pageSize: 10000000,
   };
   const { data = [], ...arg }: any = await request.sendRequestByKey(
     "GET_RESRVATION_LIST",

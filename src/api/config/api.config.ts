@@ -24,7 +24,7 @@ const API_CONFIG: ApiConfigItem[] = [
     desc: "门店列表",
     key: "GET_STORE_LIST",
   },
-  ///app/tech/list
+
   {
     url: "/app/work/tech/byProject",
     methods: "POST",
@@ -63,6 +63,13 @@ const API_CONFIG: ApiConfigItem[] = [
     methods: "POST",
     desc: "我的预约列表",
     key: "GET_RESRVATION_LIST",
+  },
+  ///kt/app/tech/reserver/reservation/list
+  {
+    url: "/kt/app/tech/reserver/reservation/list",
+    methods: "POST",
+    desc: "技师预约列表",
+    key: "GET_TECH_RESRVATION_LIST",
   },
 
   {
